@@ -8,7 +8,12 @@ errcho "${1}..."
 tmp="$(mktemp)"
 sed 's/</\n</g' "${1}" > "${tmp}"
 
-img_url="$(grep "<img" "${tmp}" | cut -d\' -f2)"
+img_url_1="$(grep -m 1 "<img" "${tmp}" | cut -d\' -f2)"
+img_url_2="$(grep -m 2 "<img" "${tmp}" | tail -n 1 | cut -d\' -f2)"
+if [ "${img_url_2}" == "${img_url_1}" ]; then
+    img_url_2=""
+fi
+
 cemetery="$(grep "<h1>" "${tmp}" | cut -d\> -f2)"
 position="$(grep "Sijainti" "${tmp}" | cut -d\  -f2-)"
 
@@ -59,7 +64,7 @@ death="${deathdate}\",\"${deathplace}"
 people+=("${name}\",\"${birth}\",\"${death}")
 
 for person in "${people[@]}"; do
-    echo "\"${img_url}\",\"${cemetery}\",\"${position}\",\"${person}\""
+    echo "\"${cemetery}\",\"${position}\",\"${person}\",\"${img_url_1}\",\"${img_url_2}\""
 done
 
 rm "${tmp}" "${tmp_people}"
