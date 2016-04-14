@@ -64,7 +64,7 @@ death="${deathdate}\",\"${deathplace}"
 people+=("${name}\",\"${birth}\",\"${death}")
 
 for person in "${people[@]}"; do
-    echo "\"${cemetery}\",\"${position}\",\"${person}\",\"${img_url_1}\",\"${img_url_2}\""
+    echo "\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\",\"${img_url_2}\""
 done
 
 rm "${tmp}" "${tmp_people}"
