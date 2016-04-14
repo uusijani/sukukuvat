@@ -1,5 +1,10 @@
 #!/bin/bash
 
+errcho () {
+    (echo "${1}" >&2)
+}
+
+errcho "${1}..."
 tmp="$(mktemp)"
 sed 's/</\n</g' "${1}" > "${tmp}"
 
@@ -55,3 +60,4 @@ for person in "${people[@]}"; do
     echo "\"${img_url}\",\"${cemetery}\",\"${position}\",\"${person}\""
 done
 
+errcho "${1} done."
