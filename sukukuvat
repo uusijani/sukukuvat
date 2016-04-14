@@ -60,4 +60,6 @@ for person in "${people[@]}"; do
     echo "\"${img_url}\",\"${cemetery}\",\"${position}\",\"${person}\""
 done
 
+rm "${tmp}" "${tmp_people}"
+
 errcho "${1} done."
