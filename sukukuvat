@@ -1,0 +1,57 @@
+#!/bin/bash
+
+tmp="$(mktemp)"
+sed 's/</\n</g' "${1}" > "${tmp}"
+
+img_url="$(grep "<img" "${tmp}" | cut -d\' -f2)"
+cemetery="$(grep "<h1>" "${tmp}" | cut -d\> -f2)"
+position="$(grep "Sijainti" "${tmp}" | cut -d\  -f2-)"
+
+tmp_people="$(mktemp)"
+awk "/<td align='center'>/ { show=1 } show; /<\/td>/ { show=0 }" "${tmp}" > "${tmp_people}"
+
+people=()
+
+name=""
+birthdate=""
+birthplace=""
+deathdate=""
+deathplace=""
+
+while read -r line; do
+    if [[ "${line}" == "<td"* ]]; then
+        continue
+    elif [[ "${line}" == "</b>"* ]]; then
+        break
+    elif [[ "${line}" == "<br>*"* ]]; then
+        birthdate="$(echo "${line}" | cut -d\  -f2)"
+        birthplace="$(echo "${line}" | cut -d\  -f3-)"
+    elif [[ "${line}" == "<br>&#134;"* ]]; then
+        deathdate="$(echo "${line}" | cut -d\  -f2)"
+        deathplace="$(echo "${line}" | cut -d\  -f3-)"
+    else
+        if [ ! -z "${name}" ]; then
+            birth="${birthdate}\",\"${birthplace}"
+            death="${deathdate}\",\"${deathplace}"
+            people+=("${name}\",\"${birth}\",\"${death}")
+            birthdate=""
+            birthplace=""
+            deathdate=""
+            deathplace=""
+        fi
+        name="$(echo "${line}" | cut -d\> -f2)"
+    fi
+done < "${tmp_people}"
+
+if [ -z "${name}" ]; then
+    echo "WARNING: failed to read name from ${1}"
+fi
+
+birth="${birthdate}\",\"${birthplace}"
+death="${deathdate}\",\"${deathplace}"
+people+=("${name}\",\"${birth}\",\"${death}")
+
+for person in "${people[@]}"; do
+    echo "\"${img_url}\",\"${cemetery}\",\"${position}\",\"${person}\""
+done
+
