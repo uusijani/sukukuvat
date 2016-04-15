@@ -1,0 +1,25 @@
+#!/bin/bash
+
+my_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+sukukuvat="${my_dir}/sukukuvat"
+number_of_files="$(ls -f | wc -l)"
+
+i=1
+files="${@:-*.html}"
+for f in ${files}; do
+    printf "\r%${#number_of_files}d / ${number_of_files}" "${i}"
+    bash "${sukukuvat}" "${f}" 2>/dev/null | while read -r line; do
+        url="$(echo "${line}" | iconv -f ISO_8859-1 | tail -n 1 | rev | cut -d\" -f 4)"
+        if [ -z "${url}" ]; then
+            echo ""
+            echo -e "\033[1mempty image url: ${f}\033[0m"
+            bash "${sukukuvat}" "${f}"
+            exit 1
+        fi
+    done
+    i=$((i + 1))
+done
+
+echo ""
+echo "all done, no issues"
+
