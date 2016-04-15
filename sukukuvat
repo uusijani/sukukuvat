@@ -39,9 +39,15 @@ while read -r line; do
         continue
     elif [[ "${line}" == "</b>"* ]]; then
         break
-    elif [[ "${line}" == "<br>*"* ]]; then
-        birthdate="$(echo "${line}" | cut -d\  -f2)"
-        birthplace="$(echo "${line}" | cut -d\  -f3-)"
+    elif [[ "${line}" =~ ^\<br\>[\*0-9] ]]; then
+        birth="$(echo "${line}" | cut -d\> -f2-)"
+        birthdate="${birth#\*}"
+        birthdate="${birthdate# }"
+        birthdate="$(echo "${birthdate}" | cut -d\  -f 1)"
+        birthplace="$(echo "${birth}" | cut -d\  -f2-)"
+        if [ "${birthplace}" == "${birthdate}" ]; then
+            birthplace=""
+        fi
     elif [[ "${line}" == "<br>&#134;"* ]]; then
         deathdate="$(echo "${line}" | cut -d\  -f2)"
         deathplace="$(echo "${line}" | cut -d\  -f3-)"
