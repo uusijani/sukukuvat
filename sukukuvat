@@ -56,7 +56,7 @@ while read -r line; do
 done < "${tmp_people}"
 
 if [ -z "${name}" ]; then
-    echo "WARNING: failed to read name from ${1}"
+    errcho "WARNING: failed to read name from ${1}"
 fi
 
 birth="${birthdate}\",\"${birthplace}"
