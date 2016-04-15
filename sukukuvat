@@ -4,7 +4,11 @@ errcho () {
     (echo "${@}" >&2)
 }
 
-errcho "${1}..."
+errcho -n "${1}: "
+if [ -t 1 ]; then
+    errcho ""
+fi
+
 tmp="$(mktemp)"
 sed 's/</\n</g' "${1}" > "${tmp}"
 
@@ -69,4 +73,9 @@ done
 
 rm "${tmp}" "${tmp_people}"
 
-errcho "${1} done."
+if [ -t 1 ]; then
+    errcho -n "${1} "
+fi
+
+errcho "done."
+
