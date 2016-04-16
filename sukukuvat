@@ -1,16 +1,10 @@
 #!/bin/bash
 
-errcho () {
+function errcho () {
     (echo "${@}" >&2)
+
 }
 
-errcho -n "${1}: "
-if [ -t 1 ]; then
-    errcho ""
-fi
-
-tmp="$(mktemp)"
-sed 's/</\n</g' "${1}" > "${tmp}"
 
 function has_more_than_max() {
     img_url_n="$(grep -m "${max_images}" "<img" "${1}" | tail -n 1 | cut -d\' -f2)"
@@ -23,27 +17,6 @@ function has_more_than_max() {
 
 }
 
-
-imgs=()
-max_images=0
-while has_more_than_max "${tmp}"; do
-    max_images=$((${max_images} + 1))
-    imgs+=($(grep -m "${max_images}" "<img" "${tmp}" | tail -n 1 | cut -d\' -f2))
-done
-
-cemetery="$(grep "<h1>" "${tmp}" | cut -d\> -f2)"
-position="$(grep "Sijainti" "${tmp}" | cut -d\  -f2-)"
-
-tmp_people="$(mktemp)"
-awk "/<td align='center'>/ { show=1 } show; /<\/td>/ { show=0 }" "${tmp}" > "${tmp_people}"
-
-people=()
-
-name=""
-birthdate=""
-birthplace=""
-deathdate=""
-deathplace=""
 
 function dateify() {
     line="${1}"
@@ -152,6 +125,35 @@ function set_death() {
 
 }
 
+
+errcho -n "${1}: "
+if [ -t 1 ]; then
+    errcho ""
+fi
+
+tmp="$(mktemp)"
+sed 's/</\n</g' "${1}" > "${tmp}"
+
+imgs=()
+max_images=0
+while has_more_than_max "${tmp}"; do
+    max_images=$((${max_images} + 1))
+    imgs+=($(grep -m "${max_images}" "<img" "${tmp}" | tail -n 1 | cut -d\' -f2))
+done
+
+cemetery="$(grep "<h1>" "${tmp}" | cut -d\> -f2)"
+position="$(grep "Sijainti" "${tmp}" | cut -d\  -f2-)"
+
+tmp_people="$(mktemp)"
+awk "/<td align='center'>/ { show=1 } show; /<\/td>/ { show=0 }" "${tmp}" > "${tmp_people}"
+
+people=()
+
+name=""
+birthdate=""
+birthplace=""
+deathdate=""
+deathplace=""
 
 while read -r line; do
     if [[ "${line}" == "<td"* ]]; then
