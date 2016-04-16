@@ -61,10 +61,18 @@ while read -r line; do
         continue
     elif [[ "${line}" == "</b>"* ]]; then
         break
-    elif [[ "${line}" =~ ^\<br\>[\*0-9] ]]; then
+    elif [[ "${line}" == "<br>*"* ]]; then
         set_birth "${line}"
     elif [[ "${line}" == "<br>&#134;"* ]]; then
         set_death "${line}"
+    elif [[ "${line}" =~ ^\<br\>[\?0-9] ]]; then
+        if [ -z "${birthdate}" ]; then
+            set_birth "${line}"
+        elif [ -z "${deathdate}" ]; then
+            set_death "${line}"
+        else
+            errcho "WARNING: line starting with [?0-9] when dates already set for ${1}"
+        fi
     else
         if [ ! -z "${name}" ]; then
             birth="${birthdate}\",\"${birthplace}"
