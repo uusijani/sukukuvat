@@ -1,0 +1,10 @@
+#!/bin/bash
+
+my_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+number_of_files="$(ls -f | wc -l)"
+
+files="${@:-*.html}"
+for f in ${files}; do
+    sed 's/</\n</g' "${f}" | grep "<img" | cut -d\' -f2
+done
+
