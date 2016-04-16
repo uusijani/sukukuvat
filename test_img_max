@@ -1,0 +1,41 @@
+#!/bin/bash
+
+my_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+sukukuvat="${my_dir}/sukukuvat"
+number_of_files="$(ls -f | wc -l)"
+tmp="$(mktemp)"
+
+function has_more_than_max() {
+    img_url_n="$(grep -m "${max_images}" "<img" "${1}" | tail -n 1 | cut -d\' -f2)"
+    img_url_m="$(grep -m "$((${max_images} + 1))" "<img" "${1}" | tail -n 1 | cut -d\' -f2)"
+    if [ "${img_url_m}" != "${img_url_n}" ]; then
+        return 0
+    fi
+
+    return 1
+
+}
+
+
+max_images=0
+max_example=""
+i=1
+files="${@:-*.html}"
+for f in ${files}; do
+    sed 's/</\n</g' "${f}" > "${tmp}"
+    while has_more_than_max "${tmp}"; do
+        max_images=$((${max_images} + 1))
+        max_example="${f}"
+    done
+
+    printf "\r%${#number_of_files}d / ${number_of_files}: maximum ${max_images}" "${i}"
+    i=$((i + 1))
+done
+
+rm -f "${tmp}"
+
+echo ""
+echo -en "all done, maximum: "
+echo -en "\033[1m${max_images}\033[0m image URLs in "
+echo -e  "\033[1m${max_example}\033[0m"
+
