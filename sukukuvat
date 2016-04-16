@@ -32,13 +32,91 @@ birthplace=""
 deathdate=""
 deathplace=""
 
+function dateify() {
+    line="${1}"
+
+    line="${line/XII/12}"
+    line="${line/XI/11}"
+    line="${line/X/10}"
+    line="${line/IX/9}"
+    line="${line/VIII/8}"
+    line="${line/VII/7}"
+    line="${line/VI/6}"
+    line="${line/V/5}"
+    line="${line/IV/4}"
+    line="${line/III/3}"
+    line="${line/II/2}"
+    line="${line/I/1.}"
+
+    line="${line,,}" # to lowercase
+
+    line="${line/ january /.1.}"
+    line="${line/ february /.2.}"
+    line="${line/ march /.3.}"
+    line="${line/ april /.4.}"
+    line="${line/ may /.5.}"
+    line="${line/ june /.6.}"
+    line="${line/ july /.7.}"
+    line="${line/ august /.8.}"
+    line="${line/ september /.9.}"
+    line="${line/ october /.10.}"
+    line="${line/ november /.11.}"
+    line="${line/ december /.12.}"
+
+    line="${line/ jan. /.1.}"
+    line="${line/ feb. /.2.}"
+    line="${line/ mar. /.3.}"
+    line="${line/ apr. /.4.}"
+    line="${line/ may /.5.}"
+    line="${line/ june /.6.}"
+    line="${line/ july /.7.}"
+    line="${line/ aug. /.8.}"
+    line="${line/ sept. /.9.}"
+    line="${line/ oct. /.10.}"
+    line="${line/ nov. /.11.}"
+    line="${line/ dec. /.12.}"
+
+    line="${line/ januari /.1.}"
+    line="${line/ februari /.2.}"
+    line="${line/ mars /.3.}"
+    line="${line/ april /.4.}"
+    line="${line/ maj /.5.}"
+    line="${line/ juni /.6.}"
+    line="${line/ juli /.7.}"
+    line="${line/ augusti /.8.}"
+    line="${line/ september /.9.}"
+    line="${line/ oktober /.10.}"
+    line="${line/ november /.11.}"
+    line="${line/ december /.12.}"
+
+    line="${line/ jan. /.1.}"
+    line="${line/ febr. /.2.}"
+    line="${line/ mars /.3.}"
+    line="${line/ april /.4.}"
+    line="${line/ maj /.5.}"
+    line="${line/ juni /.6.}"
+    line="${line/ juli /.7.}"
+    line="${line/ aug. /.8.}"
+    line="${line/ sep. /.9.}"
+    line="${line/ okt. /.10.}"
+    line="${line/ nov. /.11.}"
+    line="${line/ dec. /.12.}"
+
+    line="${line/../.}"
+
+    echo "${line}"
+
+}
+
+
 function set_birth() {
     line="${1}"
     birth="$(echo "${line}" | cut -d\> -f2-)"
     birthdate="${birth#\*}"
     birthdate="${birthdate# }"
-    birthdate="$(echo "${birthdate}" | cut -d\  -f 1)"
-    birthplace="$(echo "${birth}" | cut -d\  -f2-)"
+    birthdate="$(dateify "${birthdate}")"
+    birthplace="$(echo "${birthdate}" | cut -d\  -f2-)"
+    birthdate="$(echo "${birthdate}" | cut -d\  -f1)"
     if [ "${birthplace}" == "${birthdate}" ]; then
         birthplace=""
     fi
@@ -48,8 +126,16 @@ function set_birth() {
 
 function set_death() {
     line="${1}"
-    deathdate="$(echo "${line}" | cut -d\  -f2)"
-    deathplace="$(echo "${line}" | cut -d\  -f3-)"
+    death="$(echo "${line}" | cut -d\> -f2-)"
+    deathdate="${death#&#134;}"
+    deathdate="${deathdate# }"
+    deathdate="$(dateify "${deathdate}")"
+    deathplace="$(echo "${deathdate}" | cut -d\  -f2-)"
+    deathdate="$(echo "${deathdate}" | cut -d\  -f 1)"
+    death="$(dateify "${deathdate}")"
+    if [ "${deathplace}" == "${deathdate}" ]; then
+        deathplace=""
+    fi
 
 }
 
