@@ -12,11 +12,24 @@ fi
 tmp="$(mktemp)"
 sed 's/</\n</g' "${1}" > "${tmp}"
 
-img_url_1="$(grep -m 1 "<img" "${tmp}" | cut -d\' -f2)"
-img_url_2="$(grep -m 2 "<img" "${tmp}" | tail -n 1 | cut -d\' -f2)"
-if [ "${img_url_2}" == "${img_url_1}" ]; then
-    img_url_2=""
-fi
+function has_more_than_max() {
+    img_url_n="$(grep -m "${max_images}" "<img" "${1}" | tail -n 1 | cut -d\' -f2)"
+    img_url_m="$(grep -m "$((${max_images} + 1))" "<img" "${1}" | tail -n 1 | cut -d\' -f2)"
+    if [ "${img_url_m}" != "${img_url_n}" ]; then
+        return 0
+    fi
+
+    return 1
+
+}
+
+
+imgs=()
+max_images=0
+while has_more_than_max "${tmp}"; do
+    max_images=$((${max_images} + 1))
+    imgs+=($(grep -m "${max_images}" "<img" "${tmp}" | tail -n 1 | cut -d\' -f2))
+done
 
 cemetery="$(grep "<h1>" "${tmp}" | cut -d\> -f2)"
 position="$(grep "Sijainti" "${tmp}" | cut -d\  -f2-)"
@@ -182,7 +195,11 @@ death="${deathdate}\",\"${deathplace}"
 people+=("${name}\",\"${birth}\",\"${death}")
 
 for person in "${people[@]}"; do
-    echo "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\",\"${img_url_2}\""
+    echo -n "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\""
+    for img in "${imgs[@]}"; do
+        echo -n ",\"${img}\""
+    done
+    echo ""
 done
 
 rm "${tmp}" "${tmp_people}"
