@@ -10,7 +10,7 @@ for f in *.html; do
     if [ "$(($i % ${1}))" -ne 0 ]; then
         continue;
     fi
-    printf "\r%${#number_of_files}d / ${number_of_files}" "${i}" >&2
+    printf "\r%${#number_of_files}d / ${number_of_files}" "$((${i} / ${1}))" >&2
     bash "${sukukuvat}" "${f}" >> "${output}" 2>/dev/null
 done
 
