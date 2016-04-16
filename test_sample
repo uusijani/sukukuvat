@@ -2,7 +2,7 @@
 
 my_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 sukukuvat="${my_dir}/sukukuvat"
-number_of_files="$(($(ls -f | wc -l) / 10))"
+number_of_files="$(($(ls -f | wc -l) / ${1}))"
 output="$(mktemp)"
 i=-1
 for f in *.html; do
