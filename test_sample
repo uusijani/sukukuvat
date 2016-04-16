@@ -16,4 +16,5 @@ done
 
 echo "" >&2
 cat "${output}"
+rm -f "${output}"
 
