@@ -42,7 +42,17 @@ function set_birth() {
     if [ "${birthplace}" == "${birthdate}" ]; then
         birthplace=""
     fi
+
 }
+
+
+function set_death() {
+    line="${1}"
+    deathdate="$(echo "${line}" | cut -d\  -f2)"
+    deathplace="$(echo "${line}" | cut -d\  -f3-)"
+
+}
+
 
 while read -r line; do
     if [[ "${line}" == "<td"* ]]; then
@@ -54,8 +64,7 @@ while read -r line; do
     elif [[ "${line}" =~ ^\<br\>[\*0-9] ]]; then
         set_birth "${line}"
     elif [[ "${line}" == "<br>&#134;"* ]]; then
-        deathdate="$(echo "${line}" | cut -d\  -f2)"
-        deathplace="$(echo "${line}" | cut -d\  -f3-)"
+        set_death "${line}"
     else
         if [ ! -z "${name}" ]; then
             birth="${birthdate}\",\"${birthplace}"
