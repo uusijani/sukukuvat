@@ -1,0 +1,19 @@
+#!/bin/bash
+
+my_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+sukukuvat="${my_dir}/sukukuvat"
+number_of_files="$(($(ls -f | wc -l) / 10))"
+output="$(mktemp)"
+i=-1
+for f in *.html; do
+    i=$((i + 1))
+    if [ "$(($i % ${1}))" -ne 0 ]; then
+        continue;
+    fi
+    printf "\r%${#number_of_files}d / ${number_of_files}" "${i}" >&2
+    bash "${sukukuvat}" "${f}" >> "${output}" 2>/dev/null
+done
+
+echo "" >&2
+cat "${output}"
+
