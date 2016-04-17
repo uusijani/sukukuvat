@@ -236,6 +236,12 @@ while read -r line; do
         fi
     elif [ -z "${name}" ]; then
         name="$(echo "${line}" | cut -d\> -f2)"
+    elif [[ "${line}" =~ \<br\>o\.?s\.?\  ]]; then
+        old_name="${line}"
+        old_name="${old_name/<br>/}"
+        old_name="${old_name/os/o.s.}"
+        old_name="${old_name/../.}"
+        name="${name} ${old_name}"
     elif [ -z "${birthdate}" -a -z "${deathdate}" ]; then
         comments="${comments} ${name}"
         comments="${comments# }"
