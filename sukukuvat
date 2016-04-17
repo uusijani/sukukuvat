@@ -125,6 +125,25 @@ function set_death() {
 }
 
 
+function clear_person() {
+    title=""
+    name=""
+    birthdate=""
+    birthplace=""
+    deathdate=""
+    deathplace=""
+
+}
+
+
+function save_person() {
+    birth="${birthdate}\",\"${birthplace}"
+    death="${deathdate}\",\"${deathplace}"
+    people+=("${title}\",\"${name}\",\"${birth}\",\"${death}")
+
+}
+
+
 errcho -n "${1}: "
 if [ -t 1 ]; then
     errcho ""
@@ -148,11 +167,7 @@ awk "/<td align='center'>/ { show=1 } show; /<\/td>/ { show=0 }" "${tmp}" > "${t
 
 people=()
 
-name=""
-birthdate=""
-birthplace=""
-deathdate=""
-deathplace=""
+clear_person
 
 while read -r line; do
     if [[ "${line}" == "<td"* ]]; then
@@ -173,16 +188,16 @@ while read -r line; do
         else
             errcho "WARNING: line starting with [?0-9] when dates already set for ${1}"
         fi
+    elif [ -z "${name}" ]; then
+        name="$(echo "${line}" | cut -d\> -f2)"
+    elif [ -z "${birthdate}" -a -z "${deathdate}" ]; then
+        title="${title} ${name}"
+        title="${title# }"
+        name="$(echo "${line}" | cut -d\> -f2)"
     else
-        if [ ! -z "${name}" ]; then
-            birth="${birthdate}\",\"${birthplace}"
-            death="${deathdate}\",\"${deathplace}"
-            people+=("${name}\",\"${birth}\",\"${death}")
-            birthdate=""
-            birthplace=""
-            deathdate=""
-            deathplace=""
-        fi
+        save_person
+        clear_person
+
         name="$(echo "${line}" | cut -d\> -f2)"
     fi
 done < "${tmp_people}"
@@ -191,9 +206,7 @@ if [ -z "${name}" ]; then
     errcho "WARNING: failed to read name from ${1}"
 fi
 
-birth="${birthdate}\",\"${birthplace}"
-death="${deathdate}\",\"${deathplace}"
-people+=("${name}\",\"${birth}\",\"${death}")
+save_person
 
 for person in "${people[@]}"; do
     echo -n "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\""
