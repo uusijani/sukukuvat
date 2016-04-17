@@ -136,7 +136,28 @@ function clear_person() {
 }
 
 
+
+function slice_daterange() {
+    if [ ! -z "${deathdate}" ]; then
+        return
+    fi
+
+    if [[ ! "${birthdate}" == *"-"* ]]; then
+        return
+    fi
+
+    if [[ ! "${birthdate}" =~ ^[0-9\?]{1,4}-[0-9\?]{1,4}$ ]]; then
+        return
+    fi
+
+    deathdate="$(echo "${birthdate}" | cut -d\- -f2)"
+    birthdate="$(echo "${birthdate}" | cut -d\- -f1)"
+}
+
+
 function save_person() {
+    slice_daterange
+
     birth="${birthdate}\",\"${birthplace}"
     death="${deathdate}\",\"${deathplace}"
     people+=("${comments}\",\"${name}\",\"${birth}\",\"${death}")
@@ -226,7 +247,7 @@ while read -r line; do
         set_birth "${line}"
     elif [[ "${line}" =~ ^\<br\>\&\#?134\; ]]; then
         set_death "${line}"
-    elif [[ "${line}" =~ ^\<br\>[\?0-9] ]]; then
+    elif [[ "${line}" =~ ^\<br\>[0-9] || "${line}" =~ ^\<br\>\?.+ ]]; then
         if [ -z "${birthdate}" ]; then
             set_birth "${line}"
         elif [ -z "${deathdate}" ]; then
