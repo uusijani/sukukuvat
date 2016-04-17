@@ -126,7 +126,7 @@ function set_death() {
 
 
 function clear_person() {
-    title=""
+    comments=""
     name=""
     birthdate=""
     birthplace=""
@@ -139,7 +139,7 @@ function clear_person() {
 function save_person() {
     birth="${birthdate}\",\"${birthplace}"
     death="${deathdate}\",\"${deathplace}"
-    people+=("${title}\",\"${name}\",\"${birth}\",\"${death}")
+    people+=("${comments}\",\"${name}\",\"${birth}\",\"${death}")
 
 }
 
@@ -191,8 +191,8 @@ while read -r line; do
     elif [ -z "${name}" ]; then
         name="$(echo "${line}" | cut -d\> -f2)"
     elif [ -z "${birthdate}" -a -z "${deathdate}" ]; then
-        title="${title} ${name}"
-        title="${title# }"
+        comments="${comments} ${name}"
+        comments="${comments# }"
         name="$(echo "${line}" | cut -d\> -f2)"
     else
         save_person
