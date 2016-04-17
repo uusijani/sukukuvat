@@ -111,7 +111,7 @@ function set_birth() {
 
 
 function set_death() {
-    line="${1}"
+    line="${1/&134;/&#134;}"
     death="$(echo "${line}" | cut -d\> -f2-)"
     deathdate="${death#&#134;}"
     deathdate="${deathdate# }"
@@ -216,7 +216,7 @@ while read -r line; do
         break
     elif [[ "${line}" == "<br>*"* ]]; then
         set_birth "${line}"
-    elif [[ "${line}" == "<br>&#134;"* ]]; then
+    elif [[ "${line}" =~ ^\<br\>\&\#?134\; ]]; then
         set_death "${line}"
     elif [[ "${line}" =~ ^\<br\>[\?0-9] ]]; then
         if [ -z "${birthdate}" ]; then
