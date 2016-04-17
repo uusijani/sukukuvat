@@ -141,6 +141,41 @@ function save_person() {
     death="${deathdate}\",\"${deathplace}"
     people+=("${comments}\",\"${name}\",\"${birth}\",\"${death}")
 
+    last_person['comments']="${comments}"
+    last_person['name']="${name}"
+    last_person['birth']="${birth}"
+    last_person['death']="${death}"
+
+}
+
+
+function have_person() {
+    if [ ! -z "${comments}" ]; then
+        return 0
+    fi
+
+    if [ ! -z "${name}" ]; then
+        return 0
+    fi
+
+    if [ ! -z "${birthdate}" ]; then
+        return 0
+    fi
+
+    if [ ! -z "${birthplace}" ]; then
+        return 0
+    fi
+
+    if [ ! -z "${deathdate}" ]; then
+        return 0
+    fi
+
+    if [ ! -z "${deathplace}" ]; then
+        return 0
+    fi
+
+    return 1
+
 }
 
 
@@ -153,10 +188,12 @@ tmp="$(mktemp)"
 sed 's/</\n</g' "${1}" > "${tmp}"
 
 imgs=()
+img_alts=()
 max_images=0
 while has_more_than_max "${tmp}"; do
     max_images=$((${max_images} + 1))
     imgs+=($(grep -m "${max_images}" "<img" "${tmp}" | tail -n 1 | cut -d\' -f2))
+    img_alts+=($(grep -m "${max_images}" "<img" "${tmp}" | tail -n 1 | cut -d\' -f4))
 done
 
 cemetery="$(grep "<h1>" "${tmp}" | cut -d\> -f2)"
@@ -165,6 +202,7 @@ position="$(grep "Sijainti" "${tmp}" | cut -d\  -f2-)"
 tmp_people="$(mktemp)"
 awk "/<td align='center'>/ { show=1 } show; /<\/td>/ { show=0 }" "${tmp}" > "${tmp_people}"
 
+declare -A last_person
 people=()
 
 clear_person
@@ -203,18 +241,42 @@ while read -r line; do
 done < "${tmp_people}"
 
 if [ -z "${name}" ]; then
-    errcho "WARNING: failed to read name from ${1}"
+    if [ \( ${#people[@]} -eq 0 \) -o \( -z "${birthdate}" -a -z "${deathdate}" \) ]; then
+        for alt in "${img_alts[@]}"; do
+            if [ ! -z "${alt}" ]; then
+                name="${name} ${alt}"
+                name="${name# }"
+            fi
+        done
+    fi
+
+    if [ -z "${name}" ]; then
+        errcho "WARNING: failed to get a name from ${1}"
+    fi
+elif [ ${#people[@]} -gt 0 -a -z "${birthdate}" -a -z "${deathdate}" ]; then
+    comments="${last_person[comments]}, ${comments}"
+    comments="${comments#, }"
+    comments="${comments}, ${name}"
+    comments="${comments#, }"
+    name="${last_person[name]}"
+    unset people[${#people[@]}-1]
 fi
 
-save_person
+if have_person; then
+    save_person
+fi
 
-for person in "${people[@]}"; do
-    echo -n "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\""
-    for img in "${imgs[@]}"; do
-        echo -n ",\"${img}\""
+if [ ${#people[@]} -eq 0 ]; then
+    errcho "WARNING: failed to get people from ${1}"
+else
+    for person in "${people[@]}"; do
+        echo -n "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\""
+        for img in "${imgs[@]}"; do
+            echo -n ",\"${img}\""
+        done
+        echo ""
     done
-    echo ""
-done
+fi
 
 rm "${tmp}" "${tmp_people}"
 
@@ -223,4 +285,3 @@ if [ -t 1 ]; then
 fi
 
 errcho "done."
-
