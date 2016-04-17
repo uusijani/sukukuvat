@@ -256,6 +256,7 @@ if [ -z "${name}" ]; then
 elif [ ${#people[@]} -gt 0 -a -z "${birthdate}" -a -z "${deathdate}" ]; then
     comments="${last_person[comments]}, ${comments}"
     comments="${comments#, }"
+    comments="${comments%, }"
     comments="${comments}, ${name}"
     comments="${comments#, }"
     name="${last_person[name]}"
