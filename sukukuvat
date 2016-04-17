@@ -306,7 +306,7 @@ if [ ${#people[@]} -eq 0 ]; then
     errcho "WARNING: failed to get people from ${1}"
 else
     for person in "${people[@]}"; do
-        echo -n "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\",\"${img_url_1}\""
+        echo -n "\"${1}\",\"${person}\",\"${cemetery}\",\"${position}\""
         for img in "${imgs[@]}"; do
             echo -n ",\"${img}\""
         done
