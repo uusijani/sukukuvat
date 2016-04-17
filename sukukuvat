@@ -118,7 +118,6 @@ function set_death() {
     deathdate="$(dateify "${deathdate}")"
     deathplace="$(echo "${deathdate}" | cut -d\  -f2-)"
     deathdate="$(echo "${deathdate}" | cut -d\  -f 1)"
-    death="$(dateify "${deathdate}")"
     if [ "${deathplace}" == "${deathdate}" ]; then
         deathplace=""
     fi
