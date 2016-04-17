@@ -88,6 +88,8 @@ function dateify() {
     line="${line/ nov. /.11.}"
     line="${line/ dec. /.12.}"
 
+    line="$(echo "${line}" | sed -e 's/ \([0-9]\{4\}\)/.\1/g')"
+
     line="${line/../.}"
 
     echo "${line}"
@@ -158,8 +160,16 @@ function slice_daterange() {
 function save_person() {
     slice_daterange
 
+    birthdate="${birthdate/ /.}"
+    birthdate="${birthdate/\//.}"
+    birthdate="${birthdate/../.}"
     birth="${birthdate}\",\"${birthplace}"
+
+    deathdate="${deathdate/ /.}"
+    deathdate="${deathdate/\//.}"
+    deathdate="${deathdate/../.}"
     death="${deathdate}\",\"${deathplace}"
+
     people+=("${comments}\",\"${name}\",\"${birth}\",\"${death}")
 
     last_person['comments']="${comments}"
