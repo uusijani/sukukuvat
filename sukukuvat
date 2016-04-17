@@ -143,8 +143,10 @@ function save_person() {
 
     last_person['comments']="${comments}"
     last_person['name']="${name}"
-    last_person['birth']="${birth}"
-    last_person['death']="${death}"
+    last_person['birthdate']="${birthdate}"
+    last_person['birthplace']="${birthplace}"
+    last_person['deathdate']="${deathdate}"
+    last_person['deathplace']="${deathplace}"
 
 }
 
