@@ -163,13 +163,17 @@ function save_person() {
     birthdate="${birthdate/ /.}"
     birthdate="${birthdate/\//.}"
     birthdate="${birthdate/../.}"
+    birthdate="${birthdate//\"/\"\"}"
     birth="${birthdate}\",\"${birthplace}"
 
     deathdate="${deathdate/ /.}"
     deathdate="${deathdate/\//.}"
     deathdate="${deathdate/../.}"
+    deathdate="${deathdate//\"/\"\"}"
     death="${deathdate}\",\"${deathplace}"
 
+    comments="${comments//\"/\"\"}"
+    name="${name//\"/\"\"}"
     people+=("${comments}\",\"${name}\",\"${birth}\",\"${death}")
 
     last_person['comments']="${comments}"
